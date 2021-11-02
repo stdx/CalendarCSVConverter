@@ -1,3 +1,3 @@
-# CalendarCSVImport
+# CalendarCSVConverter
 Converts an xls file into a googleCalendar CSV
 Language C#
