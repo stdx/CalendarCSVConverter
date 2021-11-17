@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/extrame/xls"
 	"math"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -47,10 +48,17 @@ const (
 )
 
 func main() {
+	if err := run(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 
 	eventArgs, err := parseEventArgs()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if flag.NArg() != 1 {
@@ -58,9 +66,9 @@ func main() {
 	}
 	xlFile, err := xls.Open(flag.Arg(0), "utf-8")
 	if err != nil {
-		panic(err)
-		return
+		return err
 	}
+
 	sheet := xlFile.GetSheet(0)
 
 	numEvents := eventArgs.RowRange.EndRow - eventArgs.RowRange.StartRow
@@ -88,6 +96,8 @@ func main() {
 		fmt.Println(event)
 	}
 
+	return nil
+
 }
 
 func parseEventArgs() (*EventParseArgs, error) {
@@ -114,12 +124,12 @@ func parseEventArgs() (*EventParseArgs, error) {
 
 func parseRange(rangeArg string) (*Range, error) {
 	if strings.TrimSpace(rangeArg) == "" {
-		return nil, errors.New("missing required range")
+		return nil, errors.New("missing required flag range")
 	}
 	r := regexp.MustCompile(`(?P<StartRow>\d+):(?P<EndRow>\d+)`)
 	matches := r.FindStringSubmatch(rangeArg)
 	if len(matches) == 0 {
-		return nil, errors.New("invalid format for range of arg")
+		return nil, errors.New("invalid format for flag range")
 	}
 	startRow, _ := strconv.Atoi(matches[r.SubexpIndex("StartRow")])
 	endRow, _ := strconv.Atoi(matches[r.SubexpIndex("EndRow")])
@@ -142,7 +152,7 @@ func toColIndex(encoded string) (int, error) {
 		pow := len(encoded) - (index + 1)
 		pos := strings.IndexRune(characterSet, char)
 		if pos == -1 {
-			return 0, errors.New("invalid character: " + string(char))
+			return 0, fmt.Errorf("invalid character: %s", string(char))
 		}
 		val += pos * int(math.Pow(float64(base), float64(pow)))
 	}
