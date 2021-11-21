@@ -1,9 +1,8 @@
 package main
 
 import (
+	"csv2csv/internal/pkg/config"
 	"csv2csv/internal/pkg/mapping"
-	"csv2csv/internal/pkg/parse"
-	"flag"
 	"fmt"
 	"github.com/extrame/xls"
 	"math"
@@ -28,15 +27,12 @@ func main() {
 
 func run() error {
 
-	eventArgs, err := parse.ArgsFromCmdLine()
+	eventArgs, err := config.FromCmdLine()
 	if err != nil {
 		return err
 	}
 
-	if flag.NArg() != 1 {
-		panic("Need exactly one input")
-	}
-	xlFile, err := xls.Open(flag.Arg(0), "utf-8")
+	xlFile, err := xls.Open(eventArgs.InputFile, "utf-8")
 	if err != nil {
 		return err
 	}

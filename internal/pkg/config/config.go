@@ -1,6 +1,7 @@
-package parse
+package config
 
 import (
+	"csv2csv/internal/pkg/common"
 	"csv2csv/internal/pkg/mapping"
 	"errors"
 	"flag"
@@ -14,17 +15,18 @@ const (
 	descriptionColFlag = "description"
 )
 
-type EventParseArgs struct {
+type EventParseConfig struct {
 	EventCols map[mapping.EventField]string
-	RowRange  *mapping.Range
+	RowRange  *common.Range
+	InputFile string
 }
 
-func ArgsFromCmdLine() (*EventParseArgs, error) {
+func FromCmdLine() (*EventParseConfig, error) {
 	rowRangeArg := flag.String("range", "", "The row range for the event fields")
 	titleColArg := flag.String(titleColFlag, "", "Column for "+titleColFlag)
 	flag.Parse()
 
-	args := &EventParseArgs{}
+	args := &EventParseConfig{}
 
 	rowRange, err := parseRange(*rowRangeArg)
 	if err != nil {
@@ -38,10 +40,15 @@ func ArgsFromCmdLine() (*EventParseArgs, error) {
 	}
 	args.EventCols[mapping.Title] = *titleColArg
 
+	if flag.NArg() != 1 {
+		return nil, errors.New("Need exactly one input")
+	}
+	args.InputFile = flag.Arg(0)
+
 	return args, nil
 }
 
-func parseRange(rangeArg string) (*mapping.Range, error) {
+func parseRange(rangeArg string) (*common.Range, error) {
 	if strings.TrimSpace(rangeArg) == "" {
 		return nil, errors.New("missing required flag range")
 	}
@@ -53,7 +60,7 @@ func parseRange(rangeArg string) (*mapping.Range, error) {
 	startRow, _ := strconv.Atoi(matches[r.SubexpIndex("StartRow")])
 	endRow, _ := strconv.Atoi(matches[r.SubexpIndex("EndRow")])
 
-	argRange := &mapping.Range{
+	argRange := &common.Range{
 		StartRow: startRow,
 		EndRow:   endRow,
 	}
