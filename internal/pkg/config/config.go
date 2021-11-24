@@ -41,7 +41,7 @@ func FromCmdLine() (*EventParseConfig, error) {
 	args.EventCols[mapping.Title] = *titleColArg
 
 	if flag.NArg() != 1 {
-		return nil, errors.New("Need exactly one input")
+		return nil, errors.New("need exactly one input")
 	}
 	args.InputFile = flag.Arg(0)
 
