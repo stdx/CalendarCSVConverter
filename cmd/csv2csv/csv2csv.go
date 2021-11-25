@@ -27,7 +27,7 @@ func run() error {
 	}
 
 	for _, event := range events {
-		fmt.Println(event)
+		fmt.Println(event.String())
 	}
 
 	return nil

@@ -13,6 +13,7 @@ const (
 	titleColFlag       = "title"
 	descriptionColFlag = "description"
 	dateFormatFlag     = "date-format"
+	dateColFlag        = "date"
 	defaultDateFormat  = "27.05.2021"
 )
 
@@ -23,12 +24,12 @@ type EventParseConfig struct {
 }
 
 func FromCmdLine() (*EventParseConfig, error) {
-	var dateFormat, titleCol string
+	var dateFormat, titleCol, dateCol string
 	rowRangeArg := flag.String("range", "", "The row range for the event fields")
 	flag.StringVar(&titleCol, titleColFlag, "", "Column for "+titleColFlag)
 	descriptionColArg := flag.String(descriptionColFlag, "", "Column for "+descriptionColFlag)
 	flag.StringVar(&dateFormat, dateFormatFlag, "", "Date format for parsing dates")
-
+	flag.StringVar(&dateCol, dateColFlag, "", "Column for date")
 	flag.Parse()
 
 	args := &EventParseConfig{}
@@ -53,6 +54,11 @@ func FromCmdLine() (*EventParseConfig, error) {
 	if strings.TrimSpace(dateFormat) == "" {
 		dateFormat = defaultDateFormat
 	}
+	args.EventCols[core.DateFormat] = dateFormat
+	if strings.TrimSpace(dateCol) == "" {
+		return nil, errors.New("missing required column for " + dateColFlag)
+	}
+	args.EventCols[core.Date] = dateCol
 
 	if flag.NArg() != 1 {
 		return nil, errors.New("need exactly one input")

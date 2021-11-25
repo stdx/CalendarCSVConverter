@@ -8,7 +8,7 @@ type Event struct {
 }
 
 func (e *Event) String() string {
-	return fmt.Sprintf("%s", e.Title)
+	return fmt.Sprintf("%s;%s", e.Title, e.Description)
 }
 
 func (e *Event) SetField(f EventField, val string) {
