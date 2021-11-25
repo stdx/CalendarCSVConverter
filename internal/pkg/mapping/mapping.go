@@ -1,7 +1,6 @@
 package mapping
 
 import (
-	"csv2csv/internal/pkg/common"
 	"csv2csv/internal/pkg/config"
 	"errors"
 	"fmt"
@@ -15,7 +14,7 @@ const (
 	characterSet     = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
-func MapToEvents(c *config.EventParseConfig) ([]common.Event, error) {
+func MapToEvents(c *config.EventParseConfig) ([]Event, error) {
 
 	xlFile, err := xls.Open(c.InputFile, "utf-8")
 	if err != nil {
@@ -28,21 +27,16 @@ func MapToEvents(c *config.EventParseConfig) ([]common.Event, error) {
 
 	rowRange := c.RowRange
 	numEvents := rowRange.EndRow - rowRange.StartRow
-	events := make([]common.Event, numEvents+1) // inclusive last event
+	events := make([]Event, numEvents+1) // inclusive last event
 	for i := 0; i <= numEvents; i++ {
-		events[i] = common.Event{}
+		events[i] = Event{}
 		rowIndex := rowRange.StartRow + i
 		row := sheet.Row(rowIndex)
 		for e, colName := range c.EventCols {
-			var fieldVal = ""
 			colIndex, err := toColIndex(colName)
 			if err == nil {
-				if row.Col(colIndex) != "" {
-					fieldVal = row.Col(colIndex)
-				}
-				switch e {
-				case Title:
-					events[i].Title = fieldVal
+				if fieldVal := row.Col(colIndex); fieldVal != "" {
+					events[i].SetField(e, fieldVal)
 				}
 			}
 		}
