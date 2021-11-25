@@ -2,6 +2,7 @@ package mapping
 
 import (
 	"csv2csv/internal/pkg/config"
+	"csv2csv/internal/pkg/core"
 	"errors"
 	"fmt"
 	"github.com/extrame/xls"
@@ -14,7 +15,7 @@ const (
 	characterSet     = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
-func MapToEvents(c *config.EventParseConfig) ([]Event, error) {
+func MapToEvents(c *config.EventParseConfig) ([]core.Event, error) {
 
 	xlFile, err := xls.Open(c.InputFile, "utf-8")
 	if err != nil {
@@ -27,9 +28,9 @@ func MapToEvents(c *config.EventParseConfig) ([]Event, error) {
 
 	rowRange := c.RowRange
 	numEvents := rowRange.EndRow - rowRange.StartRow
-	events := make([]Event, numEvents+1) // inclusive last event
+	events := make([]core.Event, numEvents+1) // inclusive last event
 	for i := 0; i <= numEvents; i++ {
-		events[i] = Event{}
+		events[i] = core.Event{}
 		rowIndex := rowRange.StartRow + i
 		row := sheet.Row(rowIndex)
 		for e, colName := range c.EventCols {

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"csv2csv/internal/pkg/mapping"
+	"csv2csv/internal/pkg/core"
 	"errors"
 	"flag"
 	"regexp"
@@ -12,18 +12,23 @@ import (
 const (
 	titleColFlag       = "title"
 	descriptionColFlag = "description"
+	dateFormatFlag     = "date-format"
+	defaultDateFormat  = "27.05.2021"
 )
 
 type EventParseConfig struct {
-	EventCols map[mapping.EventField]string
+	EventCols map[core.EventField]string
 	RowRange  *Range
 	InputFile string
 }
 
 func FromCmdLine() (*EventParseConfig, error) {
+	var dateFormat, titleCol string
 	rowRangeArg := flag.String("range", "", "The row range for the event fields")
-	titleColArg := flag.String(titleColFlag, "", "Column for "+titleColFlag)
+	flag.StringVar(&titleCol, titleColFlag, "", "Column for "+titleColFlag)
 	descriptionColArg := flag.String(descriptionColFlag, "", "Column for "+descriptionColFlag)
+	flag.StringVar(&dateFormat, dateFormatFlag, "", "Date format for parsing dates")
+
 	flag.Parse()
 
 	args := &EventParseConfig{}
@@ -34,16 +39,20 @@ func FromCmdLine() (*EventParseConfig, error) {
 	}
 	args.RowRange = rowRange
 
-	args.EventCols = map[mapping.EventField]string{}
+	args.EventCols = map[core.EventField]string{}
 
-	if strings.TrimSpace(*titleColArg) == "" {
+	if strings.TrimSpace(titleCol) == "" {
 		return nil, errors.New("missing required column for " + titleColFlag)
 	}
-	args.EventCols[mapping.Title] = *titleColArg
+	args.EventCols[core.Title] = titleCol
 	if strings.TrimSpace(*descriptionColArg) == "" {
 		return nil, errors.New("missing required column for " + descriptionColFlag)
 	}
-	args.EventCols[mapping.Description] = *descriptionColArg
+	args.EventCols[core.Description] = *descriptionColArg
+
+	if strings.TrimSpace(dateFormat) == "" {
+		dateFormat = defaultDateFormat
+	}
 
 	if flag.NArg() != 1 {
 		return nil, errors.New("need exactly one input")
