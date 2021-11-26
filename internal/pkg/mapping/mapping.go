@@ -15,7 +15,7 @@ const (
 	characterSet     = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
-func MapToEvents(c *config.EventParseConfig) ([]core.Event, error) {
+func ReadEvents(c *config.EventParseConfig) ([]core.Event, error) {
 
 	xlFile, err := xls.Open(c.InputFile, "utf-8")
 	if err != nil {

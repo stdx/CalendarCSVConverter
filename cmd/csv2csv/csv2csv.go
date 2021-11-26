@@ -3,6 +3,7 @@ package main
 import (
 	"csv2csv/internal/pkg/config"
 	"csv2csv/internal/pkg/mapping"
+	"csv2csv/internal/pkg/output"
 	"fmt"
 	"os"
 )
@@ -21,14 +22,12 @@ func run() error {
 		return err
 	}
 
-	events, err := mapping.MapToEvents(parseConfig)
+	events, err := mapping.ReadEvents(parseConfig)
 	if err != nil {
 		return err
 	}
 
-	for _, event := range events {
-		fmt.Println(event.String())
-	}
-
+	g := &output.GoogleCsvEventWriter{}
+	g.Write(events)
 	return nil
 }
