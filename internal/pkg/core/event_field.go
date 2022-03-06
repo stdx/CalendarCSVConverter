@@ -6,5 +6,6 @@ const (
 	Title EventField = iota
 	Description
 	DateFormat
-	Date
+	StartDate
+	StartTime
 )
